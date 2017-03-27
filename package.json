@@ -1,0 +1,10 @@
+{
+  "name": "upperAtmo",
+  "version": "0.1.0",
+  "private": true,
+  "dependencies": {},
+  "devDependencies": {
+    "jasmine": "^2.5.3"
+  },
+  "scripts": {}
+}
