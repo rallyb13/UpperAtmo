@@ -56,4 +56,30 @@ describe('UpperAtmo', function() {
       expect(UA.balloons[0].signal).toEqual('boulderRolledUp');
     });
   });
+  
+  describe('liftOnce', function() {
+    it('should push a new object into the balloons array that has a value of false for the once key', function() {
+      UA.liftOnce('irreversibleChoiceMade', RandomObject.doSomething);
+      expect(UA.balloons[0]).toEqual({
+        signal: 'irreversibleChoiceMade',
+        capsule: RandomObject.doSomething,
+        once: true
+      });
+    });
+    it('should not push a new object into the balloons array if an argument is missing', function() {
+      UA.liftOnce(null, RandomObject.doSomething);
+      expect(UA.balloons.length).toEqual(0);
+    });
+  });
+  
+  describe('clearSky', function() {
+    it('should empty the balloons array of any/all objects', function() {
+      UA.inflate('playSomeMetallica', RandomObject.doSomething);
+      UA.liftOnce('playSomeSkynyrd', RandomObject.doNothing);
+      expect(UA.balloons.length).toEqual(2); // check setup assumptions
+      
+      UA.clearSky();
+      expect(UA.balloons.length).toEqual(0);
+    });
+  });
 });

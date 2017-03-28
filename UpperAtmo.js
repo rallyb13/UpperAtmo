@@ -2,6 +2,8 @@ function UpperAtmo() {
   this.balloons = [];
 }
 
+/****************** BALLOON (event-awaiter) HANDLERS *******************/
+
 /*
 * adds an event-awaiter object to an array (event-awaiter/listener is a balloon in this extended metaphor)
 * @param {string} signal - name that identifies unique event
@@ -32,13 +34,33 @@ UpperAtmo.prototype.deflate = function(signal, capsule) {
   }
 };
 
-UpperAtmo.prototype.liftOnce = function(register, capsule, passengers) {
-  // create/add listener "balloon" for one-time use
+/*
+* adds an event-awaiter object to an array for one-time use
+* note: could have re-used inflate fn (with additional arg), but want separate fn for clarity (and in case of further divergence)
+* @param {string} signal - name that identifies unique event
+* @param {function} capsule - the callback (bound to the object it's called on)
+*/
+UpperAtmo.prototype.liftOnce = function(signal, capsule) {
+  var balloons = this.balloons;
+  if (signal !== null && typeof signal !== 'undefined' && capsule !== null && typeof capsule !== 'undefined') {
+    balloons.push({
+      signal: signal,
+      capsule: capsule,
+      once: true
+    });
+  }
 };
 
+/*
+* basic clearing fn to reset balloons to empty array (thus removing ALL event-awaiters)
+* TODO: possible future improvement would be to clear by source (maybe as diff fn)
+*/
 UpperAtmo.prototype.clearSky = function() {
-  // remove ALL listeners
+  this.balloons = [];
 };
+
+
+/*********************** SIGNAL & RESPONSE HANDLING ******************/
 
 UpperAtmo.prototype.signal = function(register, content) {
   // trigger event
