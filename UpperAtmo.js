@@ -78,18 +78,30 @@ UpperAtmo.prototype.signal = function(signal, content) {
   for (var i=0; i < balloons.length; i++) {
     if(balloons[i].signal === signal) {
       this.respond(balloons[i].capsule, args);
+      if (balloons[i].once === true) {
+        toRemoves.push(i);
+      }
     }
   }
 
-  // TODO: should handle deflate(s) if once: true, AFTER respond fns  
+  // handle removing single-use balloons
+  if (toRemoves.length > 0) {
+    toRemoves.reverse(); // use indexes back to front so they don't change
+    for (var k=0; k < toRemoves.length; k++) {
+      balloons.splice(toRemoves[k], 1);
+    }
+  }
 };
 
 /*** private ***/
-
+// respond to event (use callback)
+// should be able to respond to multiple listeners
 UpperAtmo.prototype.respond = function(capsule, args) {
-  // respond to event (use callback)
-  // should be able to respond to multiple listeners
-
+  if (args.length === 0) {
+    capsule()
+  } else {
+    capsule.apply(this, args);
+  }
 };
 
 module.exports = UpperAtmo;

@@ -3,7 +3,7 @@ describe('UpperAtmo', function() {
   var UA;
   var OtherObject;
   
-  beforeEach(function(){
+  beforeEach(function() {
     UA = new UpperAtmo;
     RandomObject = {
       music: '',
@@ -11,8 +11,11 @@ describe('UpperAtmo', function() {
         console.log('do something');
       },
       doNothing: function() {},
-      playSong: function(song) {
+      playSong: function(song, songTwo) {
         this.music = song;
+        if(songTwo) {
+          this.music += this.music + ', ' + songTwo;
+        }
       }
     }
   });
@@ -97,8 +100,11 @@ describe('UpperAtmo', function() {
   });
   
   describe('signal', function() {
-    it('should call respond (private fn), passing in the correct callback for a matching signal', function() {
+    beforeEach(function() {
       spyOn(UA, 'respond');
+    });
+    
+    it('should call respond (private fn), passing in the correct callback for a matching signal', function() {
       UA.inflate('floydPinked', RandomObject.doSomething);
       UA.inflate('crowsCounted', RandomObject.playSong);
       UA.inflate('mathMuted', RandomObject.doSomething);
@@ -108,14 +114,12 @@ describe('UpperAtmo', function() {
       expect(UA.respond).toHaveBeenCalledWith(RandomObject.playSong, []);
     });
     it('should call respond fn with an array of arguments', function() {
-      spyOn(UA, 'respond');
       UA.inflate('fooFought', RandomObject.playSong);
       
       UA.signal('fooFought', 'My Poor Brain', 'Congregation', 'Halo');
       expect(UA.respond).toHaveBeenCalledWith(RandomObject.playSong, ['My Poor Brain', 'Congregation', 'Halo']);
     });
     it('should fire respond fn multiple times when more than one object has matching signal', function() {
-      spyOn(UA, 'respond');
       UA.inflate('benFolded', RandomObject.doSomething);
       UA.inflate('benjaminBroken', RandomObject.doNothing);
       UA.inflate('benFolded', RandomObject.playSong);
@@ -125,5 +129,29 @@ describe('UpperAtmo', function() {
       expect(UA.respond).toHaveBeenCalledWith(RandomObject.doSomething, ['One Down']);
       expect(UA.respond).toHaveBeenCalledWith(RandomObject.playSong, ['One Down']);
     });
+    it('should remove object from balloons array that has once set to true (after calling respond)', function() {
+      UA.liftOnce('davidByrned', RandomObject.playSong);
+      UA.inflate('davidByrned', RandomObject.doSomething);
+      expect(UA.balloons.length).toEqual(2); // check setup assumptions
+
+      UA.signal('davidByrned');
+      expect(UA.respond).toHaveBeenCalledWith(RandomObject.playSong, []);
+      expect(UA.respond).toHaveBeenCalledWith(RandomObject.doSomething, []);
+      expect(UA.balloons.length).toEqual(1);
+      expect(UA.balloons[0].capsule).toEqual(RandomObject.doSomething);
+    });
+  });
+  
+  describe('respond', function() {
+    it('should call the stored callback when no args passed', function() {
+      spyOn(RandomObject, 'doSomething');
+      UA.respond(RandomObject.doSomething, []);
+      expect(RandomObject.doSomething).toHaveBeenCalled();
+    });
+    it('should call the stored callback with args', function() {
+      spyOn(RandomObject, 'playSong');
+      UA.respond(RandomObject.playSong, ['While You See A Chance', 'Take On Me']);
+      expect(RandomObject.playSong).toHaveBeenCalledWith('While You See A Chance', 'Take On Me');
+    })
   });
 });
