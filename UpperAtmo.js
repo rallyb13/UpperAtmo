@@ -62,7 +62,13 @@ UpperAtmo.prototype.clearSky = function() {
 
 /*********************** SIGNAL & RESPONSE HANDLING ******************/
 
-UpperAtmo.prototype.signal = function(signal, content) {
+/*
+* handles identifying all balloons watching for signal and passes them to response fn
+* also collects args into array and removes one-time-use balloons from array
+* @param {string} signal - name of event that has occurred
+* @param {undefined} content - arg(s), can be any type depending on what callback accepts
+*/
+UpperAtmo.prototype.signal = function(signalName, content) {
   var balloons = this.balloons,
     toRemoves = [],
     args = [];
@@ -76,7 +82,7 @@ UpperAtmo.prototype.signal = function(signal, content) {
   }
   
   for (var i=0; i < balloons.length; i++) {
-    if(balloons[i].signal === signal) {
+    if(balloons[i].signal === signalName) {
       this.respond(balloons[i].capsule, args);
       if (balloons[i].once === true) {
         toRemoves.push(i);
@@ -94,8 +100,12 @@ UpperAtmo.prototype.signal = function(signal, content) {
 };
 
 /*** private ***/
-// respond to event (use callback)
-// should be able to respond to multiple listeners
+
+/*
+* sole purpose fn for calling callback (applying args if given)
+* @param {function} capsule - bound callback
+* @param {array} args - array of arguments for callback (empty array if none)
+*/
 UpperAtmo.prototype.respond = function(capsule, args) {
   if (args.length === 0) {
     capsule()

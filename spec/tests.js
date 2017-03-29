@@ -152,6 +152,6 @@ describe('UpperAtmo', function() {
       spyOn(RandomObject, 'playSong');
       UA.respond(RandomObject.playSong, ['While You See A Chance', 'Take On Me']);
       expect(RandomObject.playSong).toHaveBeenCalledWith('While You See A Chance', 'Take On Me');
-    })
+    });
   });
 });
