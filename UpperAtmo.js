@@ -11,7 +11,7 @@ function UpperAtmo() {
 */
 UpperAtmo.prototype.inflate = function(signal, capsule) {
   var balloons = this.balloons;
-  if (signal !== null && typeof signal !== 'undefined' && capsule !== null && typeof capsule !== 'undefined') {
+  if (typeof signal === 'string' && typeof capsule === 'function') {
     balloons.push({
       signal: signal,
       capsule: capsule,
@@ -42,7 +42,7 @@ UpperAtmo.prototype.deflate = function(signal, capsule) {
 */
 UpperAtmo.prototype.liftOnce = function(signal, capsule) {
   var balloons = this.balloons;
-  if (signal !== null && typeof signal !== 'undefined' && capsule !== null && typeof capsule !== 'undefined') {
+  if (typeof signal === 'string' && typeof capsule === 'function') {
     balloons.push({
       signal: signal,
       capsule: capsule,
@@ -62,14 +62,34 @@ UpperAtmo.prototype.clearSky = function() {
 
 /*********************** SIGNAL & RESPONSE HANDLING ******************/
 
-UpperAtmo.prototype.signal = function(register, content) {
-  // trigger event
+UpperAtmo.prototype.signal = function(signal, content) {
+  var balloons = this.balloons,
+    toRemoves = [],
+    args = [];
+  
+  if (content !== null && typeof content !== "undefined") {
+    if (arguments.length > 1){
+      for (var j=1; j < arguments.length; j++) {
+        args.push(arguments[j]);
+      }
+    }
+  }
+  
+  for (var i=0; i < balloons.length; i++) {
+    if(balloons[i].signal === signal) {
+      this.respond(balloons[i].capsule, args);
+    }
+  }
+
+  // TODO: should handle deflate(s) if once: true, AFTER respond fns  
 };
 
-UpperAtmo.prototype.respond = function(register, content) {
+/*** private ***/
+
+UpperAtmo.prototype.respond = function(capsule, args) {
   // respond to event (use callback)
   // should be able to respond to multiple listeners
-  // should handle deflate if balloon listed as one-timer
+
 };
 
 module.exports = UpperAtmo;
